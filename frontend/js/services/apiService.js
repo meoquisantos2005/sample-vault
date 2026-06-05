@@ -6,6 +6,7 @@
 */
 
 // Configuración base de la API
+// Este comentario va a dar conflicto
 const API_URL = "/api";
 
 const apiService = {
