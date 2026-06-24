@@ -50,17 +50,26 @@ if (registerForm)
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
 
-        try 
-        {
-            await apiService.request('/auth/register', 'POST', { username, password });
-            // En lugar de alert...
-            showModal('¡Éxito!', 'Usuario creado. Ahora puedes iniciar sesión.');
-            // Esperar un momento o usar el botón del modal para redirigir
-            setTimeout(() => { window.location.href = '/login'; }, 2000);
+        if (password.length < 6) {
+
+            showModal('Error de Registro', "La contraseña es demasiado corta");
+            
+        } else {
+            try 
+            {
+                await apiService.request('/auth/register', 'POST', { username, password });
+                // En lugar de alert...
+                showModal('¡Éxito!', 'Usuario creado. Ahora puedes iniciar sesión.');
+                // Esperar un momento o usar el botón del modal para redirigir
+                setTimeout(() => { window.location.href = '/login'; }, 2000);
+            }
+            catch (error)
+            {
+                showModal('Error de Registro', error.message);
+            }
+
         }
-        catch (error)
-        {
-            showModal('Error de Registro', error.message);
-        }
+
+        
     });
 }
