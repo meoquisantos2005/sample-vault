@@ -13,7 +13,7 @@ const userRepo = require('../repositories/userRepo'); // Importamos el repositor
  * Deserialización moderna: "Del objeto que devuelve este require, buscá la propiedad que se 
  * llame exactamente SECRET_KEY y creá una constante con ese mismo nombre y valor".
  *  */ 
-const { SECRET_KEY } = require('../middleware/authMiddleware'); 
+const { SECRET_KEY } = require('../middleware/authMiddleware');
 
 class AuthController 
 {
@@ -24,12 +24,20 @@ class AuthController
         {
             const { username, password } = req.body;
 
-            // 1. Validación de presencia
             if (!username || !password) {
-                return res.status(400).json({ message: "Usuario y contraseña son requeridos." });
+                return res.status(400).json({
+                    message: "Usuario y contraseña son requeridos."
+                });
             }
 
-            const hashedPassword = await bcrypt.hash(password, 10);            
+            // Validación de longitud mínima
+            if (password.length < 6) {
+                return res.status(400).json({
+                    message: "La contraseña es demasiado corta."
+                });
+            }
+
+            const hashedPassword = await bcrypt.hash(password, 10);          
             
             // 2. Creación mediante el repositorio (que usa el SP sp_create_user)
             const userId = await userRepo.create(username, hashedPassword, 'producer');
@@ -43,7 +51,7 @@ class AuthController
         {
             // 3. Manejo de error específico: Usuario Duplicado (Código ER_DUP_ENTRY en MySQL)
             if (error.code === 'ER_DUP_ENTRY') {
-                return res.status(409).json({ message: "El nombre de usuario ya existe." });
+                return res.status(409).json({ message: "El nombre de usuario ya está en uso." });
             }
 
             res.status(500).json({ 
